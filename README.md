@@ -1,4 +1,4 @@
-# ESP32 WAV Recorder – WiFi Audio Logger
+# ESP32 WAV Recorder
 
 A standalone ESP32-based audio recorder with OLED interface, SD card storage, playback support, battery monitoring, and WiFi file access. Record, play, and download WAV files directly from your device.
 
