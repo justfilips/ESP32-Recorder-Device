@@ -12,6 +12,7 @@ A standalone ESP32-based audio recorder with OLED interface, SD card storage, pl
 * Recording start/stop
 * Playback of recordings
 * WiFi file access
+* Battery status indicator
 
 ---
 
@@ -38,7 +39,7 @@ ESP32 WAV Recorder/
 └─ LICENSE
 ```
 
-> **Note:** Ensure SD card, I2S, and OLED connections match the pin configuration in the code. Update paths if you reorganize files.
+> **Note:** Ensure SD card, I2S, and OLED connections match the pin configuration in the code.
 
 ---
 
@@ -49,7 +50,7 @@ ESP32 WAV Recorder/
 * Automatic file saving (`rec1.wav`, `rec2.wav`, ...)
 * OLED menu interface with icons and navigation
 * WiFi access point for downloading recordings
-* Battery voltage & percentage monitoring
+* Battery percentage monitoring
 * Dynamic gain control for clean audio recording
 * Low-power WiFi mode (disables display + audio)
 
@@ -187,30 +188,50 @@ Controls:
 * `LEFT` → Back to menu
 
 ---
-
 ## Connections / Wiring
 
-| Component          | Pin on Component | ESP32 / Notes |
-| ------------------ | ---------------- | ------------- |
-| **I2S Microphone** | BCK              | GPIO 4        |
-|                    | WS               | GPIO 5        |
-|                    | SD               | GPIO 6        |
-| **I2S Speaker**    | BCLK             | GPIO 20       |
-|                    | LRC              | GPIO 21       |
-|                    | DOUT             | GPIO 45       |
-| **SD Card**        | CS               | GPIO 14       |
-|                    | MOSI             | GPIO 11       |
-|                    | MISO             | GPIO 13       |
-|                    | SCK              | GPIO 12       |
-| **OLED Display**   | SDA              | GPIO 21       |
-|                    | SCL              | GPIO 22       |
-| **Buttons**        | UP               | GPIO 10       |
-|                    | DOWN             | GPIO 7        |
-|                    | LEFT             | GPIO 16       |
-|                    | RIGHT            | GPIO 15       |
-|                    | OK               | GPIO 17       |
-| **Battery Input**  | ADC              | GPIO 2        |
+| Component                 | Pin on Component             | ESP32 / Notes        |
+| ------------------------- | ---------------------------- | -------------------- |
+| **OLED Display**          | VDD                          | 3.3V                 |
+|                           | GND                          | GND                  |
+|                           | SCK                          | GPIO 9               |
+|                           | SDA                          | GPIO 8               |
+| **Tactile Buttons**       | UP                           | GPIO 10              |
+|                           | DOWN                         | GPIO 7               |
+|                           | LEFT                         | GPIO 16              |
+|                           | RIGHT                        | GPIO 15              |
+|                           | OK                           | GPIO 17              |
+| **MicroSD Card**          | CS                           | GPIO 14              |
+|                           | MOSI                         | GPIO 11              |
+|                           | MISO                         | GPIO 13              |
+|                           | SCK                          | GPIO 12              |
+| **MEMS Microphone (I2S)** | SCK (BCLK)                   | GPIO 4               |
+|                           | WS (LRCLK)                   | GPIO 5               |
+|                           | SD (DATA)                    | GPIO 6               |
+|                           | VDD                          | 3.3V                 |
+|                           | GND                          | GND                  |
+|                           | L/R                          | GND                  |
+| **MAX Amplifier (I2S)**   | BCLK                         | GPIO 20              |
+|                           | LRC                          | GPIO 21              |
+|                           | DIN                          | GPIO 45              |
+|                           | VIN                          | 5V                   |
+|                           | GND                          | GND                  |
+|                           | SD                           | 3.3V                 |
+|                           | GAIN                         | Floating             |
+|                           | SPK+                         | Speaker Red Wire     |
+|                           | SPK−                         | Speaker Black Wire   |
+| **Capacitors (4× 220µF)** | + (long leg)                 | 5V (near amplifier)  |
+|                           | − (short leg)                | GND (near amplifier) |
+| **Battery Monitoring**    | Battery + → Resistor Divider | 2× 100kΩ resistors   |
+|                           | Divider Output               | GPIO 2 (ADC)         |
 
+---
+
+### Notes
+
+* The **2× 100kΩ resistors** form a voltage divider to safely measure battery voltage via ADC (GPIO 2).
+* Place the **220µF capacitors in parallel** close to the amplifier power pins to stabilize voltage.
+* Ensure **common ground** across all components.
 ---
 
 ## License
